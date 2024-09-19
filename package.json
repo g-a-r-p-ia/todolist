@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@originjs/vite-plugin-global-style": "^1.0.3"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "react-uuid": "^2.0.0",
+    "styled-components": "^6.1.13"
+  }
+}
