@@ -11,7 +11,5 @@ export const GlobalStyle = createGlobalStyle`
         font-family: 'Sofadi One';
     }
 
-    body::-webkit-scrollbar{
-        width: 0px;
-    }
+    
 `;

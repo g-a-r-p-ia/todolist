@@ -5,6 +5,7 @@
   "dependencies": {
     "gsap": "^3.12.5",
     "react-uuid": "^2.0.0",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "uuid": "^10.0.0"
   }
 }
