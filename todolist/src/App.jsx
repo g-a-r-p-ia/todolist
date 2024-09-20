@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import styled from "styled-components";
 import { myTodos } from "./data/todo"
@@ -14,6 +14,23 @@ function App() {
         setValue(e.target.value)
         console.log(value)
     }
+    const saveToLocalStorage = (todos) => {
+        if (todos) {
+            localStorage.setItem('todos', JSON.stringify(todos))
+        }
+    }
+    useEffect(() => {
+        const localTodos = localStorage.getItem('todos')
+        if (localTodos) {
+            setTodos(JSON.parse(localTodos))
+        }
+    }, [])
+    const removeItem = (id) => {
+        const filtered = todos.filter((todo) => {
+            return todo.id !== id
+        })
+        localStorage.setItem('todos', JSON.stringify(filtered))
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!value || value.length < 3) { return alert ('Todo must be at lest 3 symbol') }
@@ -23,9 +40,11 @@ function App() {
             completed: false
         }]
         setTodos(newTodos)
+        saveToLocalStorage(newTodos)
         setValue('')
     }
     const toDoRemove = (id) => {
+        removeItem(id)
         const filtered = todos.filter((todo) => {
             return todo.id !== id
         })
@@ -45,6 +64,16 @@ function App() {
             })
         }
  
+    }
+    const handleCompleted = (id) => {
+        const newTodos = todos.map((todo) => {
+            if (todo.id === id) {
+                todo.completed = !todo.completed
+            }
+            return todo
+        })
+        setTodos(newTodos)
+        saveToLocalStorage(newTodos)
     }
 
     return (
