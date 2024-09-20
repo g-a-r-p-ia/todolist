@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { myTodos } from "./data/todo"
 import List from './components/List';
 import uuid from 'react-uuid'
+import { DndContext } from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
 
 function App() {
     const [todos, setTodos] = useState(myTodos)
@@ -29,9 +31,24 @@ function App() {
         })
        setTodos(filtered)
     }
+    const handleDragEnd = (event) => {
+        const { active, over } = event
+        if (active.id !== over.id) {
+            setTodos((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id)
+                const newIndex = items.findIndex((item) => item.id === over.id)
+
+                const newItems = [...items]
+                newItems.splice(oldIndex, 1)
+                newItems.splice(newIndex, 0, items[oldIndex])
+                return newItems
+            })
+        }
+ 
+    }
 
     return (
-        <div className="App">
+        <AppStyled className="App">
             <form action="" className="form" onSubmit={handleSubmit}>
                 <h1>Today`s Tasks</h1>
                 <div className="input-container">
@@ -41,21 +58,26 @@ function App() {
                     </div>
                 </div>
             </form>
-             <ul className="todos-con">
-                {
-                    todos.map((todo) => { 
-                        const {id,name,completed} = todo
-                        return <List
-                            key={id}
-                            name={name}
-                            completed={completed}
-                            id={id}
-                            toDoRemove={toDoRemove} />
-                    })
-                }
-            </ul> 
+            <DndContext onDragEnd={handleDragEnd} >
+                <SortableContext items={todos.map((todo) => todo.id) }>
+                    <ul className="todos-con">
+                        {
+                            todos.map((todo) => {
+                                const { id, name, completed } = todo
+                                return <List
+                                    key={id}
+                                    name={name}
+                                    completed={completed}
+                                    id={id}
+                                    toDoRemove={toDoRemove} />
+                            })
+                        }
+                    </ul> 
+                </SortableContext>
+            </DndContext>
+             
 
-        </div>
+        </AppStyled>
   );
 }
 const AppStyled = styled.div`
