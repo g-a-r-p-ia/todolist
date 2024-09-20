@@ -2,10 +2,10 @@ import React from 'react'
 
 const check = <i class="fa-solid fa-check"></i>
  
-function List({name, completed, id}) {
+function List({name, completed, id, toDoRemove}) {
     return (
         <div>
-            <li>
+            <li onDoubleClick={() => toDoRemove(id)}>
                 <p>{name}</p>
             </li>
             <div className="complete-btn">

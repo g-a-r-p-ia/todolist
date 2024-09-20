@@ -23,6 +23,12 @@ function App() {
         setTodos(newTodos)
         setValue('')
     }
+    const toDoRemove = (id) => {
+        const filtered = todos.filter((todo) => {
+            return todo.id !== id
+        })
+       setTodos(filtered)
+    }
 
     return (
         <div className="App">
@@ -39,7 +45,12 @@ function App() {
                 {
                     todos.map((todo) => { 
                         const {id,name,completed} = todo
-                        return <List key={id} name={name} completed={completed} id={id} />
+                        return <List
+                            key={id}
+                            name={name}
+                            completed={completed}
+                            id={id}
+                            toDoRemove={toDoRemove} />
                     })
                 }
             </ul> 
