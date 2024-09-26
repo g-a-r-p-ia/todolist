@@ -8,8 +8,10 @@ export const GlobalStyle = createGlobalStyle`
         box-sizing: border-box;
     }
     body{
-        font-family: 'Sofadi One';
+        font-family: 'Sofadi One', sofadi;
     }
 
-    
+    body::-webkit-scrollbar{
+        width: 0px;
+    } 
 `;

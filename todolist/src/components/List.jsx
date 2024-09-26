@@ -2,11 +2,17 @@ import React from 'react'
 import styled from 'styled-components';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useThemeContext } from '../context/themeContext';
+import { useMemo } from 'react';
 
-
-const check = <i class="fa-solid fa-check"></i>
+const check = <i class = "fa-solid fa-check"></i>
  
-function List({ name, completed, id, toDoRemove }) {
+function List({ name, completed, id, toDoRemove, handleCompleted  }) {
+
+    const theme = useThemeContext()
+    const todoRef = useRef()
+    const nameRef = useRef() 
+
     const {
         attributes,
         listeners,
@@ -19,12 +25,35 @@ function List({ name, completed, id, toDoRemove }) {
         transition,
 
     }
+   
+    const randomColors = [
+        theme.buttonGradient1,
+        theme.buttonGradient2,
+        theme.buttonGradient3,
+        theme.buttonGradient4,
+        theme.buttonGradient5,
+        
+    ]
+
+   
+    const randomizeColor = () => {
+        const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)]
+        return randomColor
+    }
+
+    const randomColorMemo = useMemo(() => {
+        return randomizeColor()
+    }, [])
+
+
+    
+
     return (
-        <ListStyled style={style} {...attributes}{...listeners} ref={setNodeRef}>
-            <li onDoubleClick={() => toDoRemove(id)}>
-                <p>{name}</p>
+        <ListStyled theme={theme} completed={completed} colors={randomColorMemo} style={style} {...attributes}{...listeners} ref={setNodeRef}>
+            <li ref={ todoRef}  onDoubleClick={() => toDoRemove(id)}>
+                <p ref={nameRef}> {name}</p>
             </li>
-            <div className="complete-btn">
+            <div className="complete-btn" onDoubleClick ={() => handleCompleted(id)}>
                 {check}
             </div>
         </ListStyled >
@@ -32,6 +61,47 @@ function List({ name, completed, id, toDoRemove }) {
     )
 }
 const ListStyled = styled.div`
-
+background: ${(props) => props.theme.colorBg2};
+position:relative;
+li{
+   background: ${(props) => props.colors};
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        margin-bottom: ${props => props.grid ? '1rem' : '0'};
+        list-style: none;
+        border: 1px solid ${props => props.theme.colorIcons3};
+        box-shadow:${props => props.theme.shadow4};
+         &:hover{
+            cursor: pointer;
+        }
+        &:active{
+            transform: scale(0.98);
+        }
+         p{
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: white;
+            color: ${(props) => props.completed ? props.theme.colorPrimaryGreen : props.theme.colorGrey0 };
+            text-decoration: ${props => props.completed ? 'line-through' : 'none'}; 
+        }
+}
+.complete-btn{
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: clamp(1.2rem, 2vw, 2rem);
+        padding: .4rem .9rem;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: ${props => props.completed ? props.theme.colorPrimaryGreen : props.theme.colorIcons2};
+        i{
+            border-radius: 50%;
+            box-shadow: 1px 3px 7px rgba(0,0,0,0.3);
+        }
+    }
 `;
 export default List

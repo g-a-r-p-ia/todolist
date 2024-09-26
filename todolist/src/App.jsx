@@ -6,10 +6,14 @@ import List from './components/List';
 import uuid from 'react-uuid'
 import { DndContext } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
+import { useThemeContext } from './context/themeContext';
 
 function App() {
     const [todos, setTodos] = useState(myTodos)
     const [value, setValue] = useState('')
+    const theme = useThemeContext()
+    
+
     const handleChange = (e) => {
         setValue(e.target.value)
         console.log(value)
@@ -60,6 +64,7 @@ function App() {
                 const newItems = [...items]
                 newItems.splice(oldIndex, 1)
                 newItems.splice(newIndex, 0, items[oldIndex])
+                saveToLocalStorage(newItems);
                 return newItems
             })
         }
@@ -77,7 +82,7 @@ function App() {
     }
 
     return (
-        <AppStyled className="App">
+        <AppStyled className="App" theme={theme} >
             <form action="" className="form" onSubmit={handleSubmit}>
                 <h1>Today`s Tasks</h1>
                 <div className="input-container">
@@ -98,7 +103,9 @@ function App() {
                                     name={name}
                                     completed={completed}
                                     id={id}
-                                    toDoRemove={toDoRemove} />
+                                    toDoRemove={toDoRemove}
+                                    handleCompleted={handleCompleted}
+                                />
                             })
                         }
                     </ul> 
@@ -110,6 +117,85 @@ function App() {
   );
 }
 const AppStyled = styled.div`
+ min-height: 100vh;
+  padding: 5rem 25rem;
+  background-color: ${(props) => props.theme.colorBg3};
+  overflow: hidden;
+  form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: ${(props) => props.theme.colorBg2};
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    padding: 2rem 1rem;
+    box-shadow: ${(props) => props.theme.shadow3};
+    border: 1px solid ${props => props.theme.colorIcons3};
+    h1{
+      font-size: clamp(1.5rem, 2vw, 2.5rem);
+      font-weight: 800;
+      color: ${(props) => props.theme.colorPrimaryGreen};
+    }
+    .input-container{
+      margin: 2rem 0;
+      position: relative;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      input, button{
+        
+        font-size: clamp(1rem, 2vw, 1.2rem);
+      }
+      input{
+        background: transparent;
+        border:1px solid ${(props) => props.theme.colorIcons3};
+        border-radius: 7px;
+        padding: .8rem 1rem;
+        color: ${(props) => props.theme.colorGrey2};
+        width: 100%;
+        &:focus{
+          outline: none;
+        }
+        &::placeholder{
+          color: ${(props) => props.theme.colorGrey3};
+        }
+        &:active, &:focus{
+          border: 1px solid ${(props) => props.theme.colorIcons};
+        }
+      }
+      button{
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+        border: none;
+        background: ${(props) => props.theme.colorPrimaryGreen};
+        height: 100%;
+        padding: 0 1rem;
+        border-top-right-radius: 7px;
+        border-bottom-right-radius: 7px;
+        color: ${(props) => props.theme.colorWhite};
+        transition: all .3s ease;
+        &:hover{
+          background: ${(props) => props.theme.colorPrimary2};
+        }
+      }
+    }
+  }
 
+  .todos-con{
+    overflow: hidden;
+    background: ${(props) => props.theme.colorBg2};
+    padding: 5rem;
+    border-radius: 1rem;
+    box-shadow: ${(props) => props.theme.shadow3};
+    border: 1px solid ${props => props.theme.colorIcons3};
+    
+      }
+    
+    
+  
 `;
 export default App;
