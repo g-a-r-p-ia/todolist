@@ -1,17 +1,20 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useThemeContext } from '../context/themeContext';
 import { useMemo } from 'react';
+import { gsap } from 'gsap'
 
 const check = <i class = "fa-solid fa-check"></i>
  
-function List({ name, completed, id, toDoRemove, handleCompleted  }) {
+function List({ name, completed, id, toDoRemove, handleCompleted }) {
 
     const theme = useThemeContext()
     const todoRef = useRef()
-    const nameRef = useRef() 
+    const nameRef = useRef()
+   
+
 
     const {
         attributes,
@@ -21,21 +24,21 @@ function List({ name, completed, id, toDoRemove, handleCompleted  }) {
         transition } = useSortable({ id })
 
     const style = {
-        transform: CSS.Transform.toString(transform), 
+        transform: CSS.Transform.toString(transform),
         transition,
 
     }
-   
+
     const randomColors = [
         theme.buttonGradient1,
         theme.buttonGradient2,
         theme.buttonGradient3,
         theme.buttonGradient4,
         theme.buttonGradient5,
-        
+
     ]
 
-   
+
     const randomizeColor = () => {
         const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)]
         return randomColor
@@ -46,11 +49,43 @@ function List({ name, completed, id, toDoRemove, handleCompleted  }) {
     }, [])
 
 
-    
+    const animatedRemove = () => {
+        gsap.to(todoRef.current, {
+            duration: 0.5,
+            opacity: 0,
+            y: -20,
+            rotationX: 180,
+            onComplete: () => {
+                toDoRemove(id);
+               
+            }
+        })
+
+    }
+
+    useEffect(() => {
+        gsap.from(nameRef.current, {
+            duration: 0.5,
+            opacity: 0,
+            y: 20,
+            rotationX: 180,
+            delay: -0.1,
+            onComplete: () => {
+                gsap.to(nameRef.current, {
+                    duration: 0.5,
+                    opacity: 1,
+                    y: 0,
+                    rotationX: 0,
+                })
+                    
+                
+            }
+        })
+    }, [completed])
 
     return (
         <ListStyled theme={theme} completed={completed} colors={randomColorMemo} style={style} {...attributes}{...listeners} ref={setNodeRef}>
-            <li ref={ todoRef}  onDoubleClick={() => toDoRemove(id)}>
+            <li ref={todoRef} onDoubleClick={animatedRemove}>
                 <p ref={nameRef}> {name}</p>
             </li>
             <div className="complete-btn" onDoubleClick ={() => handleCompleted(id)}>

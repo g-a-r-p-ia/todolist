@@ -1,3 +1,4 @@
+// Ñ12, F3, Ñ13, Ñ14
 import { useEffect, useState } from 'react'
 import './App.css'
 import styled from "styled-components";
@@ -12,7 +13,19 @@ function App() {
     const [todos, setTodos] = useState(myTodos)
     const [value, setValue] = useState('')
     const theme = useThemeContext()
-    
+    const serverAddress = "ws://localhost:5000";
+    const ws = new WebSocket(serverAddress);
+
+    ws.onopen = function () {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send("Hello from PCamp!");
+        }
+    };
+
+    ws.onmessage = function (msg) {
+        console.log("Received msg from the server: " + msg.data);
+    };
+
 
     const handleChange = (e) => {
         setValue(e.target.value)
@@ -28,16 +41,32 @@ function App() {
         if (localTodos) {
             setTodos(JSON.parse(localTodos))
         }
-    }, [])
+
+        const handleStorageChange = (event) => {
+            if (event.key === 'todos') {
+                setTodos(JSON.parse(event.newValue));
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+
+    }, []);
     const removeItem = (id) => {
         const filtered = todos.filter((todo) => {
             return todo.id !== id
         })
         localStorage.setItem('todos', JSON.stringify(filtered))
+
+
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!value || value.length < 3) { return alert ('Todo must be at lest 3 symbol') }
+        if (!value || value.length < 3) { return alert('Todo must be at lest 3 symbol') }
         const newTodos = [...todos, {
             id: uuid(),
             name: value,
@@ -52,7 +81,7 @@ function App() {
         const filtered = todos.filter((todo) => {
             return todo.id !== id
         })
-       setTodos(filtered)
+        setTodos(filtered);
     }
     const handleDragEnd = (event) => {
         const { active, over } = event
@@ -64,12 +93,16 @@ function App() {
                 const newItems = [...items]
                 newItems.splice(oldIndex, 1)
                 newItems.splice(newIndex, 0, items[oldIndex])
+                // const message = JSON.stringify({ type: 'drag', newItems });
+                // serverConnection.send(message);
                 saveToLocalStorage(newItems);
+
                 return newItems
             })
         }
- 
+
     }
+
     const handleCompleted = (id) => {
         const newTodos = todos.map((todo) => {
             if (todo.id === id) {
@@ -79,8 +112,9 @@ function App() {
         })
         setTodos(newTodos)
         saveToLocalStorage(newTodos)
-    }
 
+    }
+   
     return (
         <AppStyled className="App" theme={theme} >
             <form action="" className="form" onSubmit={handleSubmit}>
@@ -92,7 +126,7 @@ function App() {
                     </div>
                 </div>
             </form>
-            <DndContext onDragEnd={handleDragEnd} >
+            <DndContext onDragEnd={handleDragEnd}>
                 <SortableContext items={todos.map((todo) => todo.id) }>
                     <ul className="todos-con">
                         {
